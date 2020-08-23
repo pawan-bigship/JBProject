@@ -19,12 +19,12 @@ namespace JBProject.Controllers
     [ApiController]
     public class UserProfileController : ControllerBase
     {
-        private readonly lUserProfileService _userRepo;
-       // private readonly IMapper _mapper;
-        public UserProfileController(lUserProfileService userRepo)
+        private readonly IUserProfileService _userRepo;
+        private readonly IMapper _mapper;
+        public UserProfileController(IUserProfileService userRepo, IMapper mapper)
         {
             _userRepo = userRepo;
-            // _mapper = mapper;, IMapper mapper
+             _mapper = mapper;
         }
         // GET: api/UserProfile/5
         [HttpGet("{id}")]

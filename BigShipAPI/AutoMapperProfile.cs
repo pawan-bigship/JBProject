@@ -8,8 +8,8 @@ namespace JBProject
     {
         public AutoMapperProfile()
         {
-          CreateMap<UserMaster, LoginResponse>();
-        CreateMap<UserInfoDTO,UserInfo>();
-                 }
+            CreateMap<UserMaster, LoginResponse>();
+            CreateMap<UserInfoDTO, UserInfo>();
+        }
     }
 }

@@ -12,12 +12,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using JBProject.Models;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper; 
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Server.IISIntegration;
-using JBProject.Data.Auth; 
+using JBProject.Data.Auth;
 using JBProject.Services.UserProfile;
 using Microsoft.AspNetCore.Http;
 
@@ -32,44 +32,39 @@ namespace JBProject
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //Allow globally connections
             services.AddCors();
-            //ends here
-            //  services.AddAuthentication(IISDefaults.AuthenticationScheme);
-            //ends here
             var connection = Configuration.GetConnectionString("BigShipDatabase");
-         services.AddDbContextPool<BigShipContext>(options => options.UseSqlServer(connection));
+            services.AddDbContextPool<BigShipContext>(options => options.UseSqlServer(connection));
             services.AddControllers();
-            //adding Imapper
-            services.AddAutoMapper(typeof(Startup));
-            //very important to map repositroy
-            services.AddSingleton<IConfiguration>(Configuration);
-            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<IAuthRepository, AuthRepository>(); 
-          services.AddScoped<lUserProfileService, UserProfileService>();
-            //Ends Here 
-            //Add Below code for applying authentication
+
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AutoMapperProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IUserProfileService, UserProfileService>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-  .AddJwtBearer(options =>
-  {
-      options.TokenValidationParameters = new TokenValidationParameters
-      {
-          ValidateIssuerSigningKey = true,
-          IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
-              .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
-          ValidateIssuer = false,
-          ValidateAudience = false
-      };
-  });
+              .AddJwtBearer(options =>
+              {
+                  options.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      ValidateIssuerSigningKey = true,
+                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
+                          .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
+                      ValidateIssuer = false,
+                      ValidateAudience = false
+                  };
+              });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //enabling core globally
             if (env.IsDevelopment())
             {
                 app.UseDirectoryBrowser();
@@ -79,7 +74,7 @@ namespace JBProject
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseRouting();
 
             // Shows UseCors with CorsPolicyBuilder.

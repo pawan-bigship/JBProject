@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace JBProject.Services.UserProfile
 {
-    public  interface lUserProfileService
+    public  interface IUserProfileService
     {
         Task<ServiceResponse<int>> Register_UserInfo(UserInfo unifo);
         Task<ServiceResponse<UserInfoDTO>> GetUserInfo(long userid);
